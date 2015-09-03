@@ -13,7 +13,7 @@ function! sipindex#Init() abort
              call sipindex#Reload()
              return
           else
-             bdelete __sipindex__
+             bwipeout __sipindex__
           endif
       endif
 
