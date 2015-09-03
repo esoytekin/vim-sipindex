@@ -37,8 +37,7 @@ function! sipindex#Init() abort
 endfunction
 
 function! sipindex#Reload() abort
-        let bufSipIndex = '__sipindex__'
-      if (s:isSippFile()<0)
+      let bufSipIndex = '__sipindex__'
       if (s:isSippFile()<0)
         echo "not sipp file"
         return
