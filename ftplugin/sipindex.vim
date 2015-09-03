@@ -49,3 +49,4 @@ function! sipindex#SwitchAndGotoLine(linePattern) abort
 endfunction
 
 nmap <buffer> <silent><CR> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
+nmap <buffer> <silent>r :call sipindex#ReloadIndex()<CR> 

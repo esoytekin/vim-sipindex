@@ -36,6 +36,16 @@ function! sipindex#Init() abort
       set nomodifiable
 endfunction
 
+function! sipindex#ReloadIndex() abort
+    let bufSipIndex = '__sipindex__'
+    if(bufname('%')!=bufSipIndex)
+        return
+    endif
+    execute "normal! \<C-W>\<C-H>"
+    call sipindex#Reload()
+    execute "normal! \<C-W>\<C-L>"
+endfunction
+
 function! sipindex#Reload() abort
       let bufSipIndex = '__sipindex__'
       if (s:isSippFile()<0)
