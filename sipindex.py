@@ -80,6 +80,8 @@ for i in range(0,bufferSize):
             searchMessageType=re.match(r"^\s*<pause\s*milliseconds=\"(\d+)\".*$",currentLine,re.I|re.M)
             if searchMessageType:
                 messageType=searchMessageType.group(1)
+                messageType=int( messageType )/1000
+                messageType=str( messageType )+ (" seconds" if ( messageType> 1 )  else " second")
             printValues(action,arrowString,messageType,lineNumber)
         elif action == ACTION:
             for j in range(i,999):

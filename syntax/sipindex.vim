@@ -19,7 +19,8 @@ syntax match   sipDirection  "\v\-"
 syntax match   sipDirection  "\v\<"
 syntax match   sipDirection  "\v\>"
 syn    match   sipWhiteSpaceBeforeNumber     "\v:\s+"
-syn    match   sipLine       "\v:\s+\d+" contains=sipWhiteSpaceBeforeNumber
+"syn    match   sipLine       "\v:\s+\d+" contains=sipWhiteSpaceBeforeNumber
+syn    match   sipLine       "\v:\s+\d+\s+:\s+\{.*\}" contains=sipWhiteSpaceBeforeNumber
 syn    match   sipString     "\v\w+.*:\s+\d+" contains=sipLine
 
 
@@ -28,7 +29,7 @@ syn sync fromstart
 "highlighting for SipIndex groups
 highlight link sipKeyword Keyword
 highlight link sipDirection Character
-highlight link sipLine Ignore "Identifier
+highlight link sipLine  Ignore "Identifier
 highlight link sipWhiteSpaceBeforeNumber Ignore "Identifier
 highlight link sipString String
 
