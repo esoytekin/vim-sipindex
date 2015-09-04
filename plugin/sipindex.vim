@@ -30,6 +30,7 @@ function! sipindex#Init() abort
       nmap <buffer> <silent>R :call sipindex#ReloadIndex()<CR> 
       nmap <buffer> <silent>D :call sipindex#DeleteSipMessage()<CR> 
       nmap <buffer> <silent>U :call sipindex#UndoDeleted()<CR> 
+      nmap <buffer> <silent>C :call sipindex#CommentSipMessage()<CR>
       "set nonu 
       "call append(0,g:arraySipIndex) 
       "unlet g:arraySipIndex
@@ -40,6 +41,9 @@ function! sipindex#Init() abort
           call s:alignFields() 
           0
       endif
+
+      let helpText = s:getHelpText()
+      call append(line('$'),helpText)
       call s:arrangeSize(getline(1))
       "nmap <buffer> <silent>q :call CloseScratch()<CR>
       nmap <buffer> <silent>q :bdelete<CR>
@@ -78,6 +82,8 @@ function! sipindex#Reload() abort
           call s:alignFields() 
           0
       endif
+      let helpText = s:getHelpText()
+      call append(line('$'),helpText)
       call s:arrangeSize(getline(1))
       setlocal nomodifiable
       call s:goto_win(1)
@@ -131,7 +137,6 @@ function! s:fillSipArray() abort
             endif
         endif
     endfor
-
     return result
     
 endfunction
@@ -249,7 +254,7 @@ endf
 
 function! s:arrangeSize(firstLine)
     let columnPos = stridx(a:firstLine,":")
-    execute "vertical resize ".columnPos
+    execute "vertical resize ".( columnPos+3 )
 endfunction
 
 function! s:alignFields() abort
@@ -286,6 +291,19 @@ function! s:goto_win(winnr, ...) abort
         execute cmd
     endif
 endfunction
+
+fun! s:getHelpText()
+   let helpText = [] 
+   
+   call add(helpText,"\" Keyboard shortcuts{{{")
+   call add(helpText,"\" <CR> -- goto line")
+   call add(helpText,"\"    R -- refresh index")
+   call add(helpText,"\"    D -- delete sip message")
+   call add(helpText,"\"    C -- comment sip message")
+   call add(helpText,"\"    U -- undo changes")
+   call add(helpText,"\"}}}")
+   return helpText
+endf
 
 "nmap <buffer> <silent><CR> :call sipindex#Pyt()<CR> 
 command! SipIndex :silent call sipindex#Init()
