@@ -297,10 +297,11 @@ fun! s:getHelpText()
    
    call add(helpText,"\" Keyboard shortcuts{{{")
    call add(helpText,"\" <CR> -- goto line")
-   call add(helpText,"\"    R -- refresh index")
+   call add(helpText,"\"    R -- manuanlly refresh sip_index")
    call add(helpText,"\"    D -- delete sip message")
    call add(helpText,"\"    C -- comment sip message")
    call add(helpText,"\"    U -- undo changes")
+   call add(helpText,"\"    q -- quit")
    call add(helpText,"\"}}}")
    return helpText
 endf
