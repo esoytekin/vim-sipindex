@@ -42,10 +42,16 @@ endif
 
 function! sipindex#SwitchAndGotoLine(linePattern) abort
  if(!empty(a:linePattern))
+    if(match(a:linePattern,':')<0)
+        echo 'Not a sip message index!!'
+        return
+    endif
     let currLine = split(a:linePattern,':')[1]
-    call s:goto_win('h')
-    execute currLine
-    execute "normal! zz"
+    if !empty(currLine)
+        call s:goto_win('h')
+        execute currLine
+        execute "normal! zz"
+    endif
  endif
 endfunction
 
@@ -53,12 +59,28 @@ function! sipindex#DeleteSipMessage() abort
     let save_cursor = getpos(".")
     let line = getline('.')
     let deleteLines = matchstr(line,'\v.*\{\zs.*\ze\}')
-    call s:goto_win(1)
-    execute deleteLines.'d'
-    "execute 'w'
-    call s:goto_win('l')
-    call sipindex#ReloadIndex()
-    call setpos('.', save_cursor)
+    if !empty(deleteLines)
+        call s:goto_win(1)
+        execute deleteLines.'d'
+        "execute 'w'
+        call s:goto_win('l')
+        call sipindex#ReloadIndex()
+        call setpos('.', save_cursor)
+    endif
+endfunction
+
+function! sipindex#CommentSipMessage() abort
+    let save_cursor = getpos(".")
+    let line = getline('.')
+    let commentLines = matchstr(line,'\v.*\{\zs.*\ze\}')
+    if !empty(commentLines)
+        call s:goto_win(1)
+        "TODO: some task
+        execute commentLines.'s/\v(^.*$)/\<!-- \1  --\>/'
+        call s:goto_win('l')
+        call sipindex#ReloadIndex()
+        call setpos('.', save_cursor)
+    endif
 endfunction
 
 fun sipindex#UndoDeleted() abort
