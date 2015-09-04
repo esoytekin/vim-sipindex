@@ -7,11 +7,11 @@ function! sipindex#Init() abort
         "echoerr "vim has to be compiled with python"
         "return
       "endif
-      let s:bufSipIndex = '__sipindex__'
       if (s:isSippFile()<0)
         echo "not sipp file"
         return
       endif
+      let s:bufSipIndex = '__sipindex__'
       if( bufexists(s:bufSipIndex))
           if (bufwinnr(s:bufSipIndex) > 0 )
              call sipindex#Reload()
@@ -23,8 +23,9 @@ function! sipindex#Init() abort
 
       "call sipindex#Pyt()
       let sipArray = s:fillSipArray()
+      let bufNr = bufnr('%')
       vert belowright new __sipindex__
-      setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nowrap
+      setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nowrap foldmethod=marker
       nmap <buffer> <silent><CR> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
       nmap <buffer> <silent><2-LeftMouse> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
       nmap <buffer> <silent>R :call sipindex#ReloadIndex()<CR> 
@@ -43,8 +44,8 @@ function! sipindex#Init() abort
       endif
 
       let helpText = s:getHelpText()
-      call append(line('$'),helpText)
-      call s:arrangeSize(getline(1))
+      call append(line('0'),helpText)
+      call s:arrangeSize(getline(len(helpText)+1))
       "nmap <buffer> <silent>q :call CloseScratch()<CR>
       nmap <buffer> <silent>q :bdelete<CR>
       setlocal nomodifiable
@@ -58,7 +59,7 @@ function! sipindex#ReloadIndex() abort
     let save_cursor = getpos(".")
       call s:goto_win(1)
     call sipindex#Reload()
-      call s:goto_win(2)
+      call s:goto_win(winnr('#'))
     call setpos('.',save_cursor)
 endfunction
 
@@ -72,7 +73,7 @@ function! sipindex#Reload() abort
       endif
       let sipArray = s:fillSipArray()
       "call sipindex#Pyt()
-      call s:goto_win(2)
+      call s:goto_win(bufwinnr(s:bufSipIndex))
       setlocal modifiable
       execute "normal! ggdG"
       call append(0,sipArray) 
@@ -83,8 +84,8 @@ function! sipindex#Reload() abort
           0
       endif
       let helpText = s:getHelpText()
-      call append(line('$'),helpText)
-      call s:arrangeSize(getline(1))
+      call append(line('0'),helpText)
+      call s:arrangeSize(getline(len(helpText)+1))
       setlocal nomodifiable
       call s:goto_win(1)
 
@@ -141,7 +142,8 @@ function! s:fillSipArray() abort
     
 endfunction
 
-" send action"{{{
+" Send Recv Action Pause  functions"{{{
+" send action
 function! s:actSend(linenum,result) abort
     let arrowSip = "-->"
     let messageType=""
@@ -173,9 +175,9 @@ function! s:actSend(linenum,result) abort
     call s:addToList(a:result,'send',arrowSip,messageType,a:linenum,deleteLines)
     return sendEnd
 
-endfunction"}}}
+endfunction
 
-" receive action"{{{
+" receive action
 function! s:actRecv(linenum,result)
     let arrowSip="<--"
     let linej = getline(a:linenum)
@@ -193,9 +195,9 @@ function! s:actRecv(linenum,result)
     endfor
     let deleteLines = '{'.a:linenum. ','.messageEnd . '}'
     call s:addToList(a:result,'recv',arrowSip,messageType,a:linenum,deleteLines)
-endfunction"}}}
+endfunction
 
-"pause action"{{{
+"pause action
 function! s:actPause(linenum,result)
     let line = getline(a:linenum)
     let arrowSip = "---"
@@ -203,9 +205,9 @@ function! s:actPause(linenum,result)
     let searchMessageType = searchMessageType/1000
     let messageType = searchMessageType . ( searchMessageType > 1 ? ' seconds' : ' second' )
     call s:addToList(a:result,'pause',arrowSip,messageType,a:linenum,'{'.a:linenum.'}')
-endfunction"}}}
+endfunction
 
-function! s:actAction(linenum,result)"{{{
+function! s:actAction(linenum,result)
     
     let arrowSip = "---"
     for jIndex in range(a:linenum,999)
@@ -222,7 +224,7 @@ function! s:actAction(linenum,result)"{{{
     return actionEnd
 endfunction"}}}
 
-fun! s:getDeleteLines(lineStart,type)
+fun! s:getDeleteLines(lineStart,type)"{{{
     for linej in range(a:lineStart,999)
         let linejStr = getline(linej)
         let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
@@ -235,7 +237,7 @@ fun! s:getDeleteLines(lineStart,type)
     
     let deleteLines = '{'.a:lineStart. ','.messageEnd .'}'
     return deleteLines
-endf
+endf"}}}
 
 fun! s:getCommentEnd(lineNr)
     for jIndex in range(a:lineNr,999)
