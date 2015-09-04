@@ -63,7 +63,9 @@ function! sipindex#DeleteSipMessage() abort
         call s:goto_win(1)
         execute deleteLines.'d'
         "execute 'w'
-        call s:goto_win('l')
+        "call s:goto_win('l')
+        "call s:goto_win(bufwinnr('__sipindex__'))
+        call s:goto_win(winnr('#')) " goto previous buffer
         call sipindex#ReloadIndex()
         call setpos('.', save_cursor)
     endif
@@ -77,7 +79,7 @@ function! sipindex#CommentSipMessage() abort
         call s:goto_win(1)
         "TODO: some task
         execute commentLines.'s/\v(^.*$)/\<!-- \1  --\>/'
-        call s:goto_win('l')
+        call s:goto_win(winnr('#')) " goto previous buffer
         call sipindex#ReloadIndex()
         call setpos('.', save_cursor)
     endif
@@ -88,7 +90,7 @@ fun sipindex#UndoDeleted() abort
     call s:goto_win(1)
     execute 'normal! u'
     "execute 'w'
-    call s:goto_win('l')
+    call s:goto_win(winnr('#')) " goto previous buffer
     call sipindex#ReloadIndex()
     call setpos('.', save_cursor)
     " code
