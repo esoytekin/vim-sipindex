@@ -1,5 +1,6 @@
 #vim-sipindex plugin
-##shows index of a sipp file
+
+shows index of a sipp file
 
 [information about sipp.](http://sipp.sourceforge.net/)
 
