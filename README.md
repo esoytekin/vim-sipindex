@@ -6,7 +6,7 @@ SIPp is a free Open Source test tool / traffic generator for the SIP protocol.
 [information about sipp.](http://sipp.sourceforge.net/)
 
 ##Usage:
-* execute :SipIndex to start
+* execute :SipIndex in a sipp xml buffer to start
 
 ## Keyboard shortcuts
 * Enter -- goto line
