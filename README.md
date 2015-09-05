@@ -8,7 +8,7 @@ SIPp is a free Open Source test tool / traffic generator for the SIP protocol.
 Needs [ Tabular ]( https://github.com/godlygeek/tabular ) vim plugin to work properly
 
 
-##Usage:
+##Usage
 * execute :SipIndex in a sipp xml buffer to start
 
 ## Keyboard shortcuts
