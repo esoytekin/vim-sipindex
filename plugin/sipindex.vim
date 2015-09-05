@@ -23,7 +23,7 @@ function! sipindex#Init() abort
 
       "call sipindex#Pyt()
       let sipArray = s:fillSipArray()
-      let bufNr = bufnr('%')
+      let g:current_buffer_name = bufname('%')
       vert belowright new __sipindex__
       setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nowrap foldmethod=marker
       nmap <buffer> <silent><CR> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
@@ -54,7 +54,7 @@ function! sipindex#ReloadIndex() abort
         return
     endif
     let save_cursor = getpos(".")
-      call s:goto_win(1)
+      call s:goto_win(bufwinnr(g:current_buffer_name))
     call sipindex#Reload()
       call s:goto_win(winnr('#'))
     call setpos('.',save_cursor)

@@ -48,7 +48,7 @@ function! sipindex#SwitchAndGotoLine(linePattern) abort
     endif
     let currLine = split(a:linePattern,':')[1]
     if !empty(currLine)
-        call s:goto_win('h')
+        call s:goto_win(bufwinnr(g:current_buffer_name))
         execute currLine
         execute "normal! zz"
     endif
@@ -60,7 +60,7 @@ function! sipindex#DeleteSipMessage() abort
     let line = getline('.')
     let deleteLines = matchstr(line,'\v.*\{\zs.*\ze\}')
     if !empty(deleteLines)
-        call s:goto_win(1)
+        call s:goto_win(bufwinnr(g:current_buffer_name))
         execute deleteLines.'d'
         "execute 'w'
         "call s:goto_win('l')
@@ -76,7 +76,7 @@ function! sipindex#CommentSipMessage() abort
     let line = getline('.')
     let commentLines = matchstr(line,'\v.*\{\zs.*\ze\}')
     if !empty(commentLines)
-        call s:goto_win(1)
+        call s:goto_win(bufwinnr(g:current_buffer_name))
         "TODO: some task
         execute commentLines.'s/\v(^.*$)/\<!-- \1  --\>/'
         call s:goto_win(winnr('#')) " goto previous buffer
@@ -86,8 +86,8 @@ function! sipindex#CommentSipMessage() abort
 endfunction
 
 fun sipindex#UndoDeleted() abort
-    let save_cursor = getpos(".")
-    call s:goto_win(1)
+    let save_cursor = getpos(".") 
+    call s:goto_win(bufwinnr(g:current_buffer_name))
     execute 'normal! u'
     "execute 'w'
     call s:goto_win(winnr('#')) " goto previous buffer
