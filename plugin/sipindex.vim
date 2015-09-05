@@ -263,8 +263,9 @@ function! s:alignFields() abort
     "set modifiable
     AddTabularPattern! sipArrow /^[^<-]*\zs[<-]/r1c0l0
     Tabularize sipArrow
-    AlignCtrl lWC : :
-    Align 
+    Tabularize /:
+    "AlignCtrl lWC : :
+    "Align 
     "w
     "set nomodifiable
 endfunction
