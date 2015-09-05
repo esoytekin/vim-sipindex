@@ -1,11 +1,14 @@
 #vim-sipindex plugin
 
-shows index of a sipp file
+shows index of a sipp file.
 SIPp is a free Open Source test tool / traffic generator for the SIP protocol. 
 
 [information about sipp.](http://sipp.sourceforge.net/)
 
-# Keyboard shortcuts
+##Usage:
+* execute :SipIndex to start
+
+## Keyboard shortcuts
 * Enter -- goto line
 *    R  -- manuanlly refresh sip_index
 *    D  -- delete sip message
