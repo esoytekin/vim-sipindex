@@ -12,7 +12,7 @@ Needs [ Tabular ]( https://github.com/godlygeek/tabular ) vim plugin to work pro
 * execute :SipIndex in a sipp xml buffer to start
 
 ## Keyboard shortcuts
-* Enter -- goto line
+* Enter -- goto sip message
 *    R  -- manuanlly refresh sip_index
 *    D  -- delete sip message
 *    C  -- comment sip message
