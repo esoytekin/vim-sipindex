@@ -1,6 +1,7 @@
 #vim-sipindex plugin
 
 shows index of a sipp file
+SIPp is a free Open Source test tool / traffic generator for the SIP protocol. 
 
 [information about sipp.](http://sipp.sourceforge.net/)
 
