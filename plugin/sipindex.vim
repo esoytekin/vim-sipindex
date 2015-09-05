@@ -38,10 +38,7 @@ function! sipindex#Init() abort
       call append(0,sipArray)
       0 
       execute "setlocal filetype=sipindex"
-      if exists(':Tabularize') 
-          call s:alignFields() 
-          0
-      endif
+      call s:alignFields() 
 
       let helpText = s:getHelpText()
       call append(line('0'),helpText)
@@ -79,10 +76,7 @@ function! sipindex#Reload() abort
       call append(0,sipArray) 
       "unlet g:arraySipIndex
       0 
-      if exists(':Tabularize') 
-          call s:alignFields() 
-          0
-      endif
+      call s:alignFields() 
       let helpText = s:getHelpText()
       call append(line('0'),helpText)
       call s:arrangeSize(getline(len(helpText)+1))
@@ -260,10 +254,13 @@ function! s:arrangeSize(firstLine)
 endfunction
 
 function! s:alignFields() abort
+    if exists(':Tabularize')
+        AddTabularPattern! sipArrow /^[^<-]*\zs[<-]/r1c0l0
+        Tabularize sipArrow
+        Tabularize /:
+        0
+    endif
     "set modifiable
-    AddTabularPattern! sipArrow /^[^<-]*\zs[<-]/r1c0l0
-    Tabularize sipArrow
-    Tabularize /:
     "AlignCtrl lWC : :
     "Align 
     "w
