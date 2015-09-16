@@ -65,7 +65,7 @@ function! sipindex#Reload() abort
         echo "not sipp file"
         return
       endif
-      if ( !bufexists(s:bufSipIndex) || bufwinnr(s:bufSipIndex) < 0 )
+      if (!exists("s:bufSipIndex") ||  !bufexists(s:bufSipIndex) || bufwinnr(s:bufSipIndex) < 0 )
         return
       endif
       let sipArray = s:fillSipArray()
