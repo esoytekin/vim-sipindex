@@ -24,8 +24,9 @@ function! sipindex#Init() abort
       "call sipindex#Pyt()
       let sipArray = s:fillSipArray()
       let g:current_buffer_name = bufname('%')
+      "vert belowright new "__sipindex__".bufname('%')
       vert belowright new __sipindex__
-      setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nowrap foldmethod=marker
+      setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nowrap foldmethod=marker filetype=sipindex
       nmap <buffer> <silent><CR> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
       nmap <buffer> <silent><2-LeftMouse> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
       nmap <buffer> <silent>R :call sipindex#ReloadIndex()<CR> 
@@ -37,7 +38,6 @@ function! sipindex#Init() abort
       "unlet g:arraySipIndex
       call append(0,sipArray)
       0 
-      execute "setlocal filetype=sipindex"
       call s:alignFields() 
 
       let helpText = s:getHelpText()
@@ -46,6 +46,7 @@ function! sipindex#Init() abort
       "nmap <buffer> <silent>q :call CloseScratch()<CR>
       nmap <buffer> <silent>q :bdelete<CR>
       setlocal nomodifiable
+      call s:goto_win(winnr('#'))
 endfunction
 
 " call from sipindex file"
@@ -81,7 +82,7 @@ function! sipindex#Reload() abort
       call append(line('0'),helpText)
       call s:arrangeSize(getline(len(helpText)+1))
       setlocal nomodifiable
-      call s:goto_win(1)
+      call s:goto_win(winnr('#'))
 
 endfunction
 
