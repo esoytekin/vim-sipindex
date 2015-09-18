@@ -41,8 +41,10 @@ function! sipindex#Init() abort
       call s:alignFields() 
 
       let helpText = s:getHelpText()
-      call append(line('0'),helpText)
-      call s:arrangeSize(getline(len(helpText)+1))
+      "call append(line('0'),helpText)
+      call append(line('$'),helpText)
+      "call s:arrangeSize(getline(len(helpText)+1))
+      call s:arrangeSize(getline(1))
       "nmap <buffer> <silent>q :call CloseScratch()<CR>
       nmap <buffer> <silent>q :bdelete<CR>
       setlocal nomodifiable
@@ -80,8 +82,10 @@ function! sipindex#Reload() abort
       0 
       call s:alignFields() 
       let helpText = s:getHelpText()
-      call append(line('0'),helpText)
-      call s:arrangeSize(getline(len(helpText)+1))
+      "call append(line('0'),helpText)
+      call append(line('$'),helpText)
+      "call s:arrangeSize(getline(len(helpText)+1))
+      call s:arrangeSize(getline(1))
       setlocal nomodifiable
       call s:goto_win(winnr('#'))
 
