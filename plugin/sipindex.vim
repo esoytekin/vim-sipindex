@@ -252,7 +252,7 @@ endf
 
 function! s:arrangeSize(firstLine)
     let columnPos = stridx(a:firstLine,":")
-    execute "vertical resize ".( columnPos+3 )
+    execute "vertical resize ".( columnPos+4 )
 endfunction
 
 function! s:alignFields() abort
