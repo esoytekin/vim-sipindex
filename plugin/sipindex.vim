@@ -55,9 +55,9 @@ function! sipindex#ReloadIndex() abort
         return
     endif
     let save_cursor = getpos(".")
-      call s:goto_win(bufwinnr(g:current_buffer_name))
+    call s:goto_win(bufwinnr(g:current_buffer_name))
     call sipindex#Reload()
-      call s:goto_win(winnr('#'))
+    call s:goto_win(winnr('#'))
     call setpos('.',save_cursor)
 endfunction
 
@@ -69,6 +69,7 @@ function! sipindex#Reload() abort
       if (!exists("s:bufSipIndex") ||  !bufexists(s:bufSipIndex) || bufwinnr(s:bufSipIndex) < 0 )
         return
       endif
+      let g:current_buffer_name = bufname('%')
       let sipArray = s:fillSipArray()
       "call sipindex#Pyt()
       call s:goto_win(bufwinnr(s:bufSipIndex))
