@@ -9,11 +9,6 @@ function! sipindex#Init() abort
       "endif
       if (s:isSippFile()<0)
         echo "not sipp file"
-        if( bufexists(s:bufSipIndex))
-          if (bufwinnr(s:bufSipIndex) > 0 )
-             bwipeout __sipindex__
-          endif
-        endif
         return
       endif
       let s:bufSipIndex = '__sipindex__'
