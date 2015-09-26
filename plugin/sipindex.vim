@@ -7,11 +7,19 @@ function! sipindex#Init() abort
         "echoerr "vim has to be compiled with python"
         "return
       "endif
+      let s:bufSipIndex = '__sipindex__'
       if (s:isSippFile()<0)
         echo "not sipp file"
+
+        if &ft!='sipindex'
+          if( bufexists(s:bufSipIndex))
+              if (bufwinnr(s:bufSipIndex) > 0 )
+                 bwipeout __sipindex__
+              endif
+          endif
+        endif
         return
       endif
-      let s:bufSipIndex = '__sipindex__'
       if( bufexists(s:bufSipIndex))
           if (bufwinnr(s:bufSipIndex) > 0 )
              call sipindex#Reload()
