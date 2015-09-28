@@ -19,4 +19,4 @@ Needs [ Tabular ]( https://github.com/godlygeek/tabular ) vim plugin to work pro
 *    U  -- undo changes
 *    q  -- quit
 
-![screen_shot](http://s13.postimg.org/4w9tjkpon/Screen_Shot_2015_09_05_at_12_43_54.png)
+![screen_shot](http://s3.postimg.org/rlhqbc583/imgvimsipindex.png)
