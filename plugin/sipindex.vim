@@ -31,6 +31,9 @@ function! sipindex#Init() abort
 
       "call sipindex#Pyt()
       let sipArray = s:fillSipArray()
+      if (len(sipArray)==0)
+        return
+      endif
       let g:current_buffer_name = bufname('%')
       "vert belowright new "__sipindex__".bufname('%')
       vert belowright new __sipindex__
@@ -82,6 +85,9 @@ function! sipindex#Reload() abort
       let g:current_buffer_name = bufname('%')
       let sipArray = s:fillSipArray()
       "call sipindex#Pyt()
+      if (len(sipArray)==0)
+        return
+      endif
       call s:goto_win(bufwinnr(s:bufSipIndex))
       setlocal modifiable
       execute "normal! ggdG"
