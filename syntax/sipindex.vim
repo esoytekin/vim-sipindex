@@ -14,7 +14,7 @@ endif
 
 syn case ignore
 
-syntax keyword sipKeyword recv send pause action
+syntax keyword sipKeyword recv send pause action send_http recv_http
 syntax match   sipDirection  "\v\-"
 syntax match   sipDirection  "\v\<"
 syntax match   sipDirection  "\v\>"

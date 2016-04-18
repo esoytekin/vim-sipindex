@@ -149,6 +149,10 @@ function! s:fillSipArray() abort
                 call s:actPause(linenum,result)
             elseif action == 'nop'
                 let actionEnd = s:actAction(linenum,result)
+            elseif action == 'send_http'
+                call s:actSendHttp(linenum,result)
+            elseif action == 'recv_http'
+                call s:actRecvHttp(linenum,result)
             endif
         endif
     endfor
@@ -189,6 +193,75 @@ function! s:actSend(linenum,result) abort
     call s:addToList(a:result,'send',arrowSip,messageType,a:linenum,deleteLines)
     return sendEnd
 
+endfunction
+
+function! s:actSendHttp(linenum,result) abort
+    let arrowSip = "-->"
+    let messageType=""
+    for linej in range(a:linenum,999)
+        let linejStr = getline(linej)
+        let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
+        if !empty(endOfMessageMultiLine)
+            let sendEnd=linej
+            break
+        endif
+
+        if empty(messageType)
+            let messageType = matchstr(linejStr,'\v^\s*\zs(POST|PUT|GET|DELETE)\ze\s*http[s]?:\/\/(.{-}\/)+.*')
+
+            if !empty(messageType) 
+                if messageType == 'POST'
+                    let postType = matchstr(linejStr,'\v^\s*(POST)\s*http[s]?:\/\/(.{-}\/)+\zs\w+\ze\s.*')
+                    if !empty(postType)
+                        let messageType = messageType." ".postType
+                    endif
+                elseif messageType == 'GET'
+                    let getType = matchstr(linejStr,'\v^\s*(GET)\s*http[s]?:\/\/(.{-}\/)+(\zs\w+\ze\/){1}.*')
+                    if !empty(getType)
+                        let messageType = messageType." ".getType
+                    endif
+                elseif messageType == 'DELETE'
+                    let getType = matchstr(linejStr,'\v^\s*(DELETE)\s*http[s]?:\/\/(.{-}\/)+(\zs\w+\ze\/){1}.*')
+                    if !empty(getType)
+                        let messageType = messageType." ".getType
+                    endif
+                elseif messageType == 'PUT'
+                    let getType = matchstr(linejStr,'\v^\s*(PUT)\s*http[s]?:\/\/(.{-}\/)+(\zs\w+\ze\/){1}.*')
+                    if !empty(getType)
+                        let messageType = messageType." ".getType
+                    endif
+                endif
+            endif
+        else
+
+        endif
+    endfor
+    let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
+    call s:addToList(a:result,'send_http',arrowSip,messageType,a:linenum,deleteLines)
+    return sendEnd
+endfunction
+
+function! s:actRecvHttp(linenum, result) abort
+    let arrowSip = "<--"
+    let messageType=""
+    for linej in range(a:linenum,999)
+
+        let linejStr = getline(linej)
+        let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
+        if !empty(endOfMessageMultiLine)
+            let sendEnd=linej
+            break
+        endif
+
+        if empty(messageType)
+            let messageType = matchstr(linejStr,'\v^\s*\<\w+\s*(response)\=\"\zs\d+\ze\"\>\s*$')
+        endif
+
+
+    endfor
+    let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
+    call s:addToList(a:result,'recv_http',arrowSip,messageType,a:linenum,deleteLines)
+    return sendEnd
 endfunction
 
 " receive action
