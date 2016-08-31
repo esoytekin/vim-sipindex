@@ -40,18 +40,15 @@ if exists(':Tabularize')
     "call s:alignFields()
 endif
 
-function! sipindex#SwitchAndGotoLine(linePattern) abort
- if(!empty(a:linePattern))
-    if(match(a:linePattern,':')<0)
-        echo 'Not a sip message index!!'
-        return
-    endif
-    let currLine = split(a:linePattern,':')[1]
-    if !empty(currLine)
-        call s:goto_win(bufwinnr(g:current_buffer_name))
-        execute currLine
-        execute "normal! zz"
-    endif
+
+function! sipindex#SwitchAndGotoLine() abort
+ let line = getline('.')
+ let messageLines = matchstr(line,'\v.*\{\zs.*\ze\}')
+ if !empty(messageLines)
+    let startLine = split(messageLines,",")[0]
+    call s:goto_win(bufwinnr(g:current_buffer_name))
+    execute startLine
+    execute "normal! zz"
  endif
 endfunction
 

@@ -8,6 +8,7 @@ function! sipindex#Init() abort
         "return
       "endif
       let s:bufSipIndex = '__sipindex__'
+
       if (s:isSippFile()<0)
         echo "not sipp file"
 
@@ -20,6 +21,7 @@ function! sipindex#Init() abort
         endif
         return
       endif
+
       if( bufexists(s:bufSipIndex))
           if (bufwinnr(s:bufSipIndex) > 0 )
              call sipindex#Reload()
@@ -38,8 +40,8 @@ function! sipindex#Init() abort
       "vert belowright new "__sipindex__".bufname('%')
       vert belowright new __sipindex__
       setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nowrap foldmethod=marker filetype=sipindex
-      nmap <buffer> <silent><CR> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
-      nmap <buffer> <silent><2-LeftMouse> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
+      nmap <buffer> <silent><CR> :call sipindex#SwitchAndGotoLine()<CR> 
+      nmap <buffer> <silent><2-LeftMouse> :call sipindex#SwitchAndGotoLine()<CR> 
       nmap <buffer> <silent>R :call sipindex#ReloadIndex()<CR> 
       nmap <buffer> <silent>D :call sipindex#DeleteSipMessage()<CR> 
       nmap <buffer> <silent>U :call sipindex#UndoDeleted()<CR> 
@@ -165,7 +167,7 @@ endfunction
 function! s:actSend(linenum,result) abort
     let arrowSip = "-->"
     let messageType=""
-    for linej in range(a:linenum,999)
+    for linej in range(a:linenum,line('$'))
         let linejStr = getline(linej)
         let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
         "let endOfMessageOneLine = matchstr(linejStr,'\v^\s*\<.*\/\>\s*$')
@@ -190,7 +192,7 @@ function! s:actSend(linenum,result) abort
         endif
     endfor
     let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
-    call s:addToList(a:result,'send',arrowSip,messageType,a:linenum,deleteLines)
+    call s:addToList(a:result,'send',arrowSip,messageType,deleteLines)
     return sendEnd
 
 endfunction
@@ -198,7 +200,7 @@ endfunction
 function! s:actSendHttp(linenum,result) abort
     let arrowSip = "-->"
     let messageType=""
-    for linej in range(a:linenum,999)
+    for linej in range(a:linenum,line('$'))
         let linejStr = getline(linej)
         let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
         if !empty(endOfMessageMultiLine)
@@ -237,14 +239,14 @@ function! s:actSendHttp(linenum,result) abort
         endif
     endfor
     let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
-    call s:addToList(a:result,'send_http',arrowSip,messageType,a:linenum,deleteLines)
+    call s:addToList(a:result,'send_http',arrowSip,messageType,deleteLines)
     return sendEnd
 endfunction
 
 function! s:actRecvHttp(linenum, result) abort
     let arrowSip = "<--"
     let messageType=""
-    for linej in range(a:linenum,999)
+    for linej in range(a:linenum,line('$'))
 
         let linejStr = getline(linej)
         let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
@@ -260,7 +262,7 @@ function! s:actRecvHttp(linenum, result) abort
 
     endfor
     let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
-    call s:addToList(a:result,'recv_http',arrowSip,messageType,a:linenum,deleteLines)
+    call s:addToList(a:result,'recv_http',arrowSip,messageType,deleteLines)
     return sendEnd
 endfunction
 
@@ -268,10 +270,10 @@ endfunction
 function! s:actRecv(linenum,result)
     let arrowSip="<--"
     let linej = getline(a:linenum)
-    let searchMessageType       = matchstr(linej,'\v^\s*\<recv\s+request\=\"\zs(\w+)\ze\".*$')
-    let searchMessageTypeClient = matchstr(linej,'\v^\s*\<recv\s+response\=\"\zs(\w+)\ze\".*$')
+    let searchMessageType       = matchstr(linej,'\v^\s*\<recv.{-}request\=\"\zs(\w+)\ze\".*$')
+    let searchMessageTypeClient = matchstr(linej,'\v^\s*\<recv.{-}response\=\"\zs(\w+)\ze\".*$')
     let messageType = empty(searchMessageType) ? searchMessageTypeClient : searchMessageType
-    for linej in range(a:linenum,999)
+    for linej in range(a:linenum,line('$'))
         let linejStr = getline(linej)
         let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
         if !empty(endOfMessageMultiLine)
@@ -281,7 +283,7 @@ function! s:actRecv(linenum,result)
 
     endfor
     let deleteLines = '{'.a:linenum. ','.messageEnd . '}'
-    call s:addToList(a:result,'recv',arrowSip,messageType,a:linenum,deleteLines)
+    call s:addToList(a:result,'recv',arrowSip,messageType,deleteLines)
 endfunction
 
 "pause action
@@ -291,13 +293,14 @@ function! s:actPause(linenum,result)
     let searchMessageType=matchstr(line,'\v^\s*\<pause\s*milliseconds\=\"\zs(\d+)\ze\".*$')
     let searchMessageType = searchMessageType/1000
     let messageType = searchMessageType . ( searchMessageType > 1 ? ' seconds' : ' second' )
-    call s:addToList(a:result,'pause',arrowSip,messageType,a:linenum,'{'.a:linenum.'}')
+    call s:addToList(a:result,'pause',arrowSip,messageType,'{'.a:linenum.'}')
 endfunction
 
 function! s:actAction(linenum,result)
     
     let arrowSip = "---"
-    for jIndex in range(a:linenum,999)
+    let actionEnd=a:linenum
+    for jIndex in range(a:linenum,line('$'))
         let currentLine = getline(jIndex)
 
         let messageType=matchstr(currentLine,'\v^\s*\<exec\s*\zs(\w+\=\".*\")\ze.*$')
@@ -312,7 +315,7 @@ function! s:actAction(linenum,result)
 endfunction"}}}
 
 fun! s:getDeleteLines(lineStart,type)"{{{
-    for linej in range(a:lineStart,999)
+    for linej in range(a:lineStart,line('$'))
         let linejStr = getline(linej)
         let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
         if !empty(endOfMessageMultiLine) && match( endOfMessageMultiLine,a:type )>=0
@@ -327,7 +330,7 @@ fun! s:getDeleteLines(lineStart,type)"{{{
 endf"}}}
 
 fun! s:getCommentEnd(lineNr)
-    for jIndex in range(a:lineNr,999)
+    for jIndex in range(a:lineNr,line('$'))
         let line = getline(jIndex)
         let searchCommentEnd=matchstr(line,'\v^.*--\>\s*$')
         if !empty(searchCommentEnd)
@@ -337,8 +340,8 @@ fun! s:getCommentEnd(lineNr)
 endf
 
 
-fun! s:addToList(list,action,arrow,msg,lineNr,deleteLines)
-    call add(a:list,a:action . ' ' . a:arrow . ' ' . a:msg . ':' . a:lineNr. ':'.a:deleteLines)
+fun! s:addToList(list,action,arrow,msg,deleteLines)
+    call add(a:list,a:action . ' ' . a:arrow . ' ' . a:msg . ':' . a:deleteLines)
 endf
 
 function! s:arrangeSize(firstLine)

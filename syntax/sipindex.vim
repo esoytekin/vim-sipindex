@@ -20,8 +20,8 @@ syntax match   sipDirection  "\v\<"
 syntax match   sipDirection  "\v\>"
 syn    match   sipWhiteSpaceBeforeNumber     "\v:\s+"
 "syn    match   sipLine       "\v:\s+\d+" contains=sipWhiteSpaceBeforeNumber
-syn    match   sipLine       "\v:\s+\d+\s+:\s+\{.*\}" contains=sipWhiteSpaceBeforeNumber
-syn    match   sipString     "\v\w+.*:\s+\d+" contains=sipLine
+syn    match   sipLine       "\v:\s+\{.*\}" contains=sipWhiteSpaceBeforeNumber
+syn    match   sipString     "\v\w+.*" contains=sipLine
 syn    match   sipComment    "\v^\".*"
 
 
