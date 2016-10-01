@@ -7,15 +7,23 @@ SIPp is a free Open Source test tool / traffic generator for the SIP protocol.
 
 Needs [ Tabular ]( https://github.com/godlygeek/tabular ) vim plugin to work properly
 
+## Installation
+I recommend installing [ pathogen.vim ]( https://github.com/tpope/vim-pathogen ), then copy and paste:
 
-##Usage
+```
+mkdir -p ~/.vim/bundle
+cd ~/.vim/bundle
+git clone https://github.com/esoytekin/vim-sipindex.git
+```
+
+## Usage
 * execute :SipIndex in a sipp xml buffer to start
 
 ## Keyboard shortcuts
 * Enter -- goto sip message
-*    R  -- manuanlly refresh sip_index
+*    R  -- manually refresh sip_index
 *    D  -- delete sip message
-*    C  -- comment sip message
+*    C  -- comment out sip message
 *    U  -- undo changes
 *    q  -- quit
 
