@@ -2,7 +2,7 @@
 " Maintainer:	Emrah Soytekin (emrahsoytekin@gmail.com)
 " URL:		
 " Last Change: 03.09.2015_08.56
-function! sipindex#Init() abort
+function! sipindex#Init() abort"{{{
       "if (!has('python'))
         "echoerr "vim has to be compiled with python"
         "return
@@ -62,10 +62,10 @@ function! sipindex#Init() abort
       nmap <buffer> <silent>q :bdelete<CR>
       setlocal nomodifiable
       call s:goto_win(winnr('#'))
-endfunction
+endfunction"}}}
 
 " call from sipindex file"
-function! sipindex#ReloadIndex() abort
+function! sipindex#ReloadIndex() abort"{{{
     if(bufname('%')!=s:bufSipIndex)
         return
     endif
@@ -74,9 +74,9 @@ function! sipindex#ReloadIndex() abort
     call sipindex#Reload()
     call s:goto_win(winnr('#'))
     call setpos('.',save_cursor)
-endfunction
+endfunction"}}}
 
-function! sipindex#Reload() abort
+function! sipindex#Reload() abort"{{{
       if (s:isSippFile()<0)
         echo "not sipp file"
         return
@@ -105,9 +105,9 @@ function! sipindex#Reload() abort
       setlocal nomodifiable
       call s:goto_win(winnr('#'))
 
-endfunction
+endfunction"}}}
 
-function! s:pyt() abort
+function! s:pyt() abort"{{{
     let paths = substitute(escape(&runtimepath, ' '), '\(,\|$\)', '/**\1', 'g')
     let s:sipindex = fnamemodify(findfile('sipindex.py', paths), ':p')
 
@@ -122,9 +122,9 @@ function! s:pyt() abort
     exec 'pyfile '.s:sipindex
     "python expand(s:sipindex)
     "exec '.!python '.s:sipindex
-endfunc
+endfunc"}}}
 
-function! s:fillSipArray() abort
+function! s:fillSipArray() abort"{{{
     let result=[]
     let sendEnd = -1
     let actionEnd = -1
@@ -160,7 +160,7 @@ function! s:fillSipArray() abort
     endfor
     return result
     
-endfunction
+endfunction"}}}
 
 " Send Recv Action Pause  functions"{{{
 " send action
@@ -310,7 +310,7 @@ function! s:actAction(linenum,result)
         endif
     endfor
     let deleteLines = s:getDeleteLines(a:linenum,'nop')
-    call s:addToList(a:result,'action',arrowSip,messageType,actionEnd,deleteLines)
+    call s:addToList(a:result,'action',arrowSip,messageType,deleteLines)
     return actionEnd
 endfunction"}}}
 
@@ -329,7 +329,7 @@ fun! s:getDeleteLines(lineStart,type)"{{{
     return deleteLines
 endf"}}}
 
-fun! s:getCommentEnd(lineNr)
+fun! s:getCommentEnd(lineNr)"{{{
     for jIndex in range(a:lineNr,line('$'))
         let line = getline(jIndex)
         let searchCommentEnd=matchstr(line,'\v^.*--\>\s*$')
@@ -337,7 +337,7 @@ fun! s:getCommentEnd(lineNr)
             return jIndex
         endif
     endfor
-endf
+endf"}}}
 
 
 fun! s:addToList(list,action,arrow,msg,deleteLines)
@@ -349,21 +349,16 @@ function! s:arrangeSize(firstLine)
     execute "vertical resize ".( columnPos+4 )
 endfunction
 
-function! s:alignFields() abort
+function! s:alignFields() abort"{{{
     if exists(':Tabularize')
         AddTabularPattern! sipArrow /^[^<-]*\zs[<-]/r1c0l0
         Tabularize sipArrow
         Tabularize /:
         0
     endif
-    "set modifiable
-    "AlignCtrl lWC : :
-    "Align 
-    "w
-    "set nomodifiable
-endfunction
+endfunction"}}}
 
-function! s:isSippFile() abort
+function! s:isSippFile() abort"{{{
     if &ft!='xml'
         return -1
     endif
@@ -374,9 +369,9 @@ function! s:isSippFile() abort
         endif
     endfor
     return -1
-endfunction
+endfunction"}}}
 
-function! s:goto_win(winnr, ...) abort
+function! s:goto_win(winnr, ...) abort"{{{
     let cmd = type(a:winnr) == type(0) ? a:winnr . 'wincmd w'
                                      \ : 'wincmd ' . a:winnr
     let noauto = a:0 > 0 ? a:1 : 0
@@ -386,9 +381,9 @@ function! s:goto_win(winnr, ...) abort
     else
         execute cmd
     endif
-endfunction
+endfunction"}}}
 
-fun! s:getHelpText()
+fun! s:getHelpText()"{{{
    let helpText = [] 
    
    call add(helpText,"\" Keyboard shortcuts{{{")
@@ -399,7 +394,7 @@ fun! s:getHelpText()
    call add(helpText,"\"    U -- undo changes")
    call add(helpText,"\"    q -- quit")
    call add(helpText,"\"}}}")
-   return helpText
+   return helpText"}}}
 endf
 
 "nmap <buffer> <silent><CR> :call sipindex#Pyt()<CR> 

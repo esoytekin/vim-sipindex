@@ -7,12 +7,13 @@
     "finish
 "endif
 
-if exists("g:loaded_sipindex_plugin")
+if exists("g:loaded_sipindex_plugin")"{{{
     finish
-endif
+endif"}}}
+
 let g:loaded_sipindex_plugin = 1
 
-function! s:alignFields() abort
+function! s:alignFields() abort"{{{
     "set modifiable
     AddTabularPattern! sipArrow /^[^<-]*\zs[<-]/r1c0l0
     Tabularize sipArrow
@@ -22,41 +23,41 @@ function! s:alignFields() abort
     vertical resize 25
     "w
     "set nomodifiable
-endfunction
+endfunction"}}}
 
-function! s:goto_win(winnr, ...) abort
+function! s:goto_win(winnr, ...) abort"{{{
     let cmd = type(a:winnr) == type(0) ? a:winnr . 'wincmd w'
                                      \ : 'wincmd ' . a:winnr
     let noauto = a:0 > 0 ? a:1 : 0
 
-    if noauto
+    if noauto"{{{
         noautocmd execute cmd
     else
         execute cmd
-    endif
-endfunction
+    endif"}}}
+endfunction"}}}
 
-if exists(':Tabularize')
+if exists(':Tabularize')"{{{
     "call s:alignFields()
-endif
+endif"}}}
 
 
-function! sipindex#SwitchAndGotoLine() abort
+function! sipindex#SwitchAndGotoLine() abort"{{{
  let line = getline('.')
  let messageLines = matchstr(line,'\v.*\{\zs.*\ze\}')
  if !empty(messageLines)
     let startLine = split(messageLines,",")[0]
     call s:goto_win(bufwinnr(g:current_buffer_name))
     execute startLine
-    execute "normal! zz"
+    execute "normal! zt"
  endif
-endfunction
+endfunction"}}}
 
-function! sipindex#DeleteSipMessage() abort
+function! sipindex#DeleteSipMessage() abort"{{{
     let save_cursor = getpos(".")
     let line = getline('.')
     let deleteLines = matchstr(line,'\v.*\{\zs.*\ze\}')
-    if !empty(deleteLines)
+    if !empty(deleteLines)"{{{
         call s:goto_win(bufwinnr(g:current_buffer_name))
         execute deleteLines.'d'
         "execute 'w'
@@ -65,24 +66,24 @@ function! sipindex#DeleteSipMessage() abort
         call s:goto_win(winnr('#')) " goto previous buffer
         call sipindex#ReloadIndex()
         call setpos('.', save_cursor)
-    endif
-endfunction
+    endif"}}}
+endfunction"}}}
 
-function! sipindex#CommentSipMessage() abort
+function! sipindex#CommentSipMessage() abort"{{{
     let save_cursor = getpos(".")
     let line = getline('.')
     let commentLines = matchstr(line,'\v.*\{\zs.*\ze\}')
-    if !empty(commentLines)
+    if !empty(commentLines)"{{{
         call s:goto_win(bufwinnr(g:current_buffer_name))
         "TODO: some task
         execute commentLines.'s/\v(^.*$)/\<!-- \1  --\>/'
         call s:goto_win(winnr('#')) " goto previous buffer
         call sipindex#ReloadIndex()
         call setpos('.', save_cursor)
-    endif
-endfunction
+    endif"}}}
+endfunction"}}}
 
-fun sipindex#UndoDeleted() abort
+fun sipindex#UndoDeleted() abort"{{{
     let save_cursor = getpos(".") 
     call s:goto_win(bufwinnr(g:current_buffer_name))
     execute 'normal! u'
@@ -91,7 +92,7 @@ fun sipindex#UndoDeleted() abort
     call sipindex#ReloadIndex()
     call setpos('.', save_cursor)
     " code
-endf
+endf"}}}
 
 "nmap <buffer> <silent><CR> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
 "nmap <buffer> <silent><2-LeftMouse> :call sipindex#SwitchAndGotoLine(getline('.'))<CR> 
