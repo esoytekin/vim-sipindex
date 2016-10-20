@@ -2,11 +2,9 @@
 " Maintainer:	Emrah Soytekin (emrahsoytekin@gmail.com)
 " URL:		
 " Last Change: 03.09.2015_08.56
-function! sipindex#Init() abort"{{{
-      "if (!has('python'))
-        "echoerr "vim has to be compiled with python"
-        "return
-      "endif
+"
+
+function! sipindex#CloseFileIfNotRelevant() abort
       let s:bufSipIndex = '__sipindex__'
 
       if (s:isSippFile()<0)
@@ -21,6 +19,28 @@ function! sipindex#Init() abort"{{{
         endif
         return
       endif
+
+endfunction
+
+function! sipindex#Init() abort"{{{
+      "if (!has('python'))
+        "echoerr "vim has to be compiled with python"
+        "return
+      "endif
+      let s:bufSipIndex = '__sipindex__'
+
+      "if (s:isSippFile()<0)
+        "echo "not sipp file"
+
+        "if &ft!='sipindex'
+          "if( bufexists(s:bufSipIndex))
+              "if (bufwinnr(s:bufSipIndex) > 0 )
+                 "bwipeout __sipindex__
+              "endif
+          "endif
+        "endif
+        "return
+      "endif
 
       if( bufexists(s:bufSipIndex))
           if (bufwinnr(s:bufSipIndex) > 0 )
@@ -77,11 +97,14 @@ function! sipindex#ReloadIndex() abort"{{{
 endfunction"}}}
 
 function! sipindex#Reload() abort"{{{
-      if (s:isSippFile()<0)
-        echo "not sipp file"
+      "if (s:isSippFile()<0)
+        "echo "not sipp file"
+        "return
+      "endif
+      if (!exists("s:bufSipIndex") ||  !bufexists(s:bufSipIndex) || bufwinnr(s:bufSipIndex) < 0 )
         return
       endif
-      if (!exists("s:bufSipIndex") ||  !bufexists(s:bufSipIndex) || bufwinnr(s:bufSipIndex) < 0 )
+      if (bufname("%") == s:bufSipIndex)
         return
       endif
       let g:current_buffer_name = bufname('%')
@@ -140,7 +163,7 @@ function! s:fillSipArray() abort"{{{
             let commentEnd = s:getCommentEnd(linenum)
             continue
         endif
-        let action = matchstr(line,'\v^\s*\<\zs(\w+)\ze.*\>\s*$')
+        let action = matchstr(line,'\v^\s*\<\zs\w+\ze.{-}\>.*$')
         "let action = matchstr(line,"\v^\s*\<\zs(\w+)\ze.*\>\s*$")
         if !empty(action)
             if action=='send'
@@ -155,6 +178,10 @@ function! s:fillSipArray() abort"{{{
                 call s:actSendHttp(linenum,result)
             elseif action == 'recv_http'
                 call s:actRecvHttp(linenum,result)
+            elseif action == 'send_ws'
+                call s:actSendWs(linenum,result)
+            elseif action == 'recv_ws'
+                call s:actRecvWs(linenum,result)
             endif
         endif
     endfor
@@ -202,33 +229,33 @@ function! s:actSendHttp(linenum,result) abort
     let messageType=""
     for linej in range(a:linenum,line('$'))
         let linejStr = getline(linej)
-        let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
+        let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*.{-}\<\/\w+\s{-}\>\s*$')
         if !empty(endOfMessageMultiLine)
             let sendEnd=linej
             break
         endif
 
         if empty(messageType)
-            let messageType = matchstr(linejStr,'\v^\s*\zs(POST|PUT|GET|DELETE)\ze\s*http[s]?:\/\/(.{-}\/)+.*')
+            let messageType = matchstr(linejStr,'\v^\s*\zs(POST|PUT|GET|DELETE)\ze\s*( http[s]?:\/\/ )?(.{-}\/)+.*$')
 
             if !empty(messageType) 
                 if messageType == 'POST'
-                    let postType = matchstr(linejStr,'\v^\s*(POST)\s*http[s]?:\/\/(.{-}\/)+\zs\w+\ze\s.*')
+                    let postType = matchstr(linejStr,'\v^\s*(POST)\s*( http[s]?:\/\/ )?(.{-}\/)+\zs\w+\ze\s.*')
                     if !empty(postType)
                         let messageType = messageType." ".postType
                     endif
                 elseif messageType == 'GET'
-                    let getType = matchstr(linejStr,'\v^\s*(GET)\s*http[s]?:\/\/(.{-}\/)+(\zs\w+\ze\/){1}.*')
+                    let getType = matchstr(linejStr,'\v^\s*(GET)\s*( http[s]?:\/\/ )?(.{-}\/)+(\zs\w+\ze\/){1}.*')
                     if !empty(getType)
                         let messageType = messageType." ".getType
                     endif
                 elseif messageType == 'DELETE'
-                    let getType = matchstr(linejStr,'\v^\s*(DELETE)\s*http[s]?:\/\/(.{-}\/)+(\zs\w+\ze\/){1}.*')
+                    let getType = matchstr(linejStr,'\v^\s*(DELETE)\s*( http[s]?:\/\/ )?(.{-}\/)+(\zs\w+\ze\/){1}.*')
                     if !empty(getType)
                         let messageType = messageType." ".getType
                     endif
                 elseif messageType == 'PUT'
-                    let getType = matchstr(linejStr,'\v^\s*(PUT)\s*http[s]?:\/\/(.{-}\/)+(\zs\w+\ze\/){1}.*')
+                    let getType = matchstr(linejStr,'\v^\s*(PUT)\s*( http[s]?:\/\/ )?(.{-}\/)+(\zs\w+\ze\/){1}.*')
                     if !empty(getType)
                         let messageType = messageType." ".getType
                     endif
@@ -256,7 +283,12 @@ function! s:actRecvHttp(linenum, result) abort
         endif
 
         if empty(messageType)
-            let messageType = matchstr(linejStr,'\v^\s*\<\w+\s*(response)\=\"\zs\d+\ze\"\>\s*$')
+            let messageType = matchstr(linejStr,'\v^\s*\<\w+\s*(response)\=\"\zs\d+\ze\".*$')
+            let endofMessageSingleLine = matchstr(linejStr,'\v^\s*\<.{-}\/\>\s*$')
+            if !empty(endofMessageSingleLine)
+                let sendEnd=linej
+                break
+            endif
         endif
 
 
@@ -264,6 +296,59 @@ function! s:actRecvHttp(linenum, result) abort
     let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
     call s:addToList(a:result,'recv_http',arrowSip,messageType,deleteLines)
     return sendEnd
+endfunction
+
+function! s:actSendWs(linenum, result) abort
+
+    let arrowSip = "-->"
+    let messageType=""
+    for linej in range(a:linenum,line('$'))
+        let linejStr = getline(linej)
+        let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
+        if !empty(endOfMessageMultiLine)
+            let sendEnd=linej
+            break
+        endif
+
+        if empty(messageType)
+            let messageType = matchstr(linejStr,'\v^\s*\<\w+\s*(frametype)\=\"\zs\w+\ze\".*$')
+            let endofMessageSingleLine = matchstr(linejStr,'\v^\s*\<.{-}\/\>\s*$')
+            if !empty(endofMessageSingleLine)
+                let sendEnd=linej
+                break
+            endif
+        endif
+    endfor
+    let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
+    call s:addToList(a:result,'send_ws',arrowSip,messageType,deleteLines)
+    return sendEnd
+endfunction
+
+function! s:actRecvWs(linenum, result) abort
+    let arrowSip = "<--"
+    let messageType=""
+    for linej in range(a:linenum,line('$'))
+        let linejStr = getline(linej)
+        let endOfMessageMultiLine = matchstr(linejStr,'\v^\s*\<\/\w+\>\s*$')
+        if !empty(endOfMessageMultiLine)
+            let sendEnd=linej
+            break
+        endif
+
+        if empty(messageType)
+            let messageType = matchstr(linejStr,'\v^\s*\<\w+\s*(frametype)\=\"\zs\w+\ze\".*$')
+            let endofMessageSingleLine = matchstr(linejStr,'\v^\s*\<.{-}\/\>\s*$')
+            if !empty(endofMessageSingleLine)
+                let sendEnd=linej
+                break
+            endif
+        endif
+    endfor
+
+    let deleteLines = '{'.a:linenum. ','.sendEnd .'}'
+    call s:addToList(a:result,'recv_ws',arrowSip,messageType,deleteLines)
+    return sendEnd
+
 endfunction
 
 " receive action
