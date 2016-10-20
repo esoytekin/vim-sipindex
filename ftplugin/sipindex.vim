@@ -49,7 +49,7 @@ function! sipindex#SwitchAndGotoLine() abort"{{{
     let startLine = split(messageLines,",")[0]
     call s:goto_win(bufwinnr(g:current_buffer_name))
     execute startLine
-    execute "normal! zt"
+    execute "normal! zz"
  endif
 endfunction"}}}
 
